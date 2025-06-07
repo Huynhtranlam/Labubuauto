@@ -1,0 +1,11 @@
+node_modules
+# Bỏ qua selenium user profiles
+selenium-profile/
+*.pma
+*.binarypb
+*.fingerprint
+*.json
+*.log
+
+# Bỏ qua file tự động điền (autofill)
+selenium-profile/AutofillStates/

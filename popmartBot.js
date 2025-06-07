@@ -51,7 +51,7 @@ async function buyProduct() {
     await signInButton.click();
     await driver.sleep(3000);
     await driver.get(
-      "https://www.popmart.com/vn/products/1952/DIMOO-Earth-Day-Figure"
+      "https://www.popmart.com/vn/products/3854/SKULLPANDA"
     );
        let buyNowButton = null;
             let attempts = 0;
@@ -63,6 +63,18 @@ async function buyProduct() {
           until.elementLocated(By.css(".index_euBtn__7NmZ6.index_red__kx6Ql")),
           2000
         );
+       const buyNowButton = await driver.wait(
+            until.elementLocated(By.css('.index_euBtn__7NmZ6.index_red__kx6Ql'))
+        );
+        await buyNowButton.click();
+        await driver.sleep(5000);
+        const proceedToPayButton = await driver.wait(
+            until.elementLocated(By.css('.ant-btn.ant-btn-primary.ant-btn-dangerous.index_placeOrderBtn__E2dbt')),
+            5000
+        );
+        await proceedToPayButton.click();
+        await driver.sleep(50000);
+
         console.log("Đã thấy nút Buy Now!");
       } catch (e) {
         console.log(`Chưa thấy nút Buy Now. Reload... (Lần ${attempts + 1})`);
@@ -76,9 +88,7 @@ async function buyProduct() {
       console.log("Không tìm thấy nút Buy Now sau nhiều lần thử.");
       return;
     }
-    await buyNowButton.click();
-    console.log("Cc");
-    // await proceedToPayButton.click();
+
     await driver.sleep(500000);
   } catch (error) {
     console.error("Đã xảy ra lỗi:", error);
