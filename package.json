@@ -10,7 +10,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "chromedriver": "^137.0.1",
     "selenium-webdriver": "^4.26.0"
+  },
+  "devDependencies": {
+    "chromedriver": "^137.0.1"
   }
 }

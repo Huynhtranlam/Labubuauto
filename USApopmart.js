@@ -3,8 +3,7 @@ const { Builder, until, By } = require("selenium-webdriver");
 require("chromedriver");
 
 (async () => {
-  const userDataDir = "D:/labubu/tmp-profile"; // thư mục không ai dùng
-  const profileDir = "Profile 3"; // hoặc có thể là 'Default', 'Profile 1', 'Profile 2', v.v.
+
 
   const options = new chrome.Options()
     .addArguments(
@@ -29,7 +28,7 @@ require("chromedriver");
 
   console.log("navigator.webdriver:", isWebDriver);
 
-  await driver.get("https://www.popmart.com/us/pop-now/set/40");
+  await driver.get("https://www.popmart.com/us/pop-now/set/270");
   await driver.sleep(10000); // 🕐 Chờ web load 5 giây
 
   for (let i = 0; i < 10000; i++) {
@@ -60,8 +59,10 @@ require("chromedriver");
         const addToBagBtn = await driver.findElement(
           By.xpath("//button[normalize-space(text())='ADD TO BAG']")
         );
-        await addToBagBtn.click();
+        // await addToBagBtn.click();
         console.log("🛒 Đã thêm vào giỏ hàng");
+        await driver.executeScript("window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');");
+        break;
       }
     } catch (err) {
       // Không tìm thấy shadowBox hoặc lỗi → xử lý refresh
