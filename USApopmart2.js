@@ -26,12 +26,12 @@ function askQuestion(query) {
   const options = new chrome.Options()
     .addArguments(
       "--disable-blink-features=AutomationControlled",
-      "--remote-debugging-port=9222",
+      "--remote-debugging-port=9220",
       "--disable-gpu",
       "--no-sandbox",
       "--disable-dev-shm-usage",
       "--start-maximized",
-      `--user-data-dir=D:/labubu/tmp-profile`,
+      `--user-data-dir=D:/labubu/tmp-profile3`,
       `--profile-directory=Default`,
       "--enable-unsafe-webgpu",
       "--enable-unsafe-swiftshader"
