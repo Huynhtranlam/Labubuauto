@@ -47,7 +47,6 @@ function askQuestion(query) {
   console.log("navigator.webdriver:", isWebDriver);
   if (mode === "1") {
     await driver.get(url); // 🟢 Đúng URL do người dùng nhập
-    console.log("✅ Mở trình duyệt thành công. Đang giữ session...");
     await driver.sleep(1000000000); // giữ Chrome mở
     return;
   }
@@ -58,33 +57,24 @@ function askQuestion(query) {
   const productId = extractIdFromUrl(url);
   const threeDigits = Number(productId.slice(6, 9));
 
-  console.log(threeDigits,"thang ccc")
 
   for (let i = 0; i < 10000; i++) {
     const productIdArray = productId.split("");
 
-    console.log(productIdArray,"cccccccc");
 
     // Random 3 số mới và thay vào vị trí 6,7,8 (tức là số 7 8 9)
-    const newThreeDigits = (
-      Math.floor(Math.random() * (100)) +
-      threeDigits
-    ).toString()
+    const newThreeDigits = (Math.floor(Math.random() * 100) + threeDigits)
+      .toString()
       .padStart(3, "0");
 
-
-
-    console.log(newThreeDigits,"newThreeDigits");
     productIdArray[6] = newThreeDigits[0];
     productIdArray[7] = newThreeDigits[1];
     productIdArray[8] = newThreeDigits[2];
 
     const newProductId = productIdArray.join("");
     const randomUrl = `${baseUrl}${prefix}-${newProductId}`;
-    console.log(`🔗 Đang thử URL: ${randomUrl}`);
 
-    await driver.get(randomUrl);
-    console.log(`🔁 Vòng lặp lần ${i + 1}`);
+   
 
     try {
       const shadowBox = await driver.findElement(
@@ -100,16 +90,14 @@ function askQuestion(query) {
           By.xpath("//button[span[text()='Buy Multiple Boxes']]")
         );
         await buyBtn.click();
+        await driver.sleep(1000);
 
-        const selectAllSpan = await driver.wait(
-          until.elementLocated(
-            By.xpath("//span[normalize-space(text())='Select all']")
-          ),
-          5000
+        const selectAllSpan = await driver.findElement(
+          By.xpath("//span[normalize-space(text())='Select all']")
         );
-        await driver.wait(until.elementIsVisible(selectAllSpan), 5000);
         await selectAllSpan.click();
 
+        await driver.sleep(500);
         const addToBagBtn = await driver.wait(
           until.elementLocated(
             By.xpath("//button[normalize-space(text())='ADD TO BAG']")
@@ -119,23 +107,10 @@ function askQuestion(query) {
         await driver.wait(until.elementIsVisible(addToBagBtn), 5000);
         await addToBagBtn.click();
 
-        if (addToBagBtn.click) {
-          await driver.executeScript(
-            "window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');"
-          );
-        }
-
         break;
       }
     } catch (err) {
-      try {
-        const nextBtn = await driver.findElement(
-          By.css("img.index_nextImg__PTfZF")
-        );
-        await nextBtn.click();
-      } catch (e) {
-        console.log("❌ Không tìm thấy nút next");
-      }
+      await driver.get(randomUrl);
     }
 
     await driver.sleep(2000);
