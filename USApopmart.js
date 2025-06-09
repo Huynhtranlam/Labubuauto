@@ -106,6 +106,13 @@ function askQuestion(query) {
         );
         await driver.wait(until.elementIsVisible(addToBagBtn), 5000);
         await addToBagBtn.click();
+        await driver.sleep(2000);
+        await driver.executeScript(
+          'window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank");'
+        );
+        let tabs = await driver.getAllWindowHandles();
+        await driver.switchTo().window(tabs[0]); // Quay lại tab cũ (nếu cần)
+
         console.log("🛒 Thêm thành công sẽ ngủ 20s rồi chạy tiếp nè");
         await driver.sleep(20000);
       }

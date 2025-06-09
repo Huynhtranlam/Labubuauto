@@ -72,6 +72,8 @@ function askQuestion(query) {
     const newProductId = productIdArray.join("");
     const randomUrl = `${baseUrl}${prefix}-${newProductId}`;
 
+    console.log(`🔄 Vòng lặp ${i + 1}: Truy cập ${randomUrl}`);
+
     try {
       await driver.sleep(1000);
       const shadowBox = await driver.findElement(
@@ -104,8 +106,15 @@ function askQuestion(query) {
         );
         await driver.wait(until.elementIsVisible(addToBagBtn), 5000);
         await addToBagBtn.click();
+        await driver.sleep(2000);
+        await driver.executeScript(
+          'window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank");'
+        );
+        let tabs = await driver.getAllWindowHandles();
+        await driver.switchTo().window(tabs[0]); // Quay lại tab cũ (nếu cần)
 
-        break;
+        console.log("🛒 Thêm thành công sẽ ngủ 20s rồi chạy tiếp nè");
+        await driver.sleep(20000);
       }
     } catch (err) {
       await driver.get(randomUrl);
