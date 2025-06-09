@@ -31,7 +31,7 @@ function askQuestion(query) {
       "--no-sandbox",
       "--disable-dev-shm-usage",
       "--start-maximized",
-      `--user-data-dir=D:/labubu/tmp-profile3`,
+      `--user-data-dir=D:/labubu/tmp-profile0`,
       `--profile-directory=Default`,
       "--enable-unsafe-webgpu",
       "--enable-unsafe-swiftshader"
@@ -63,7 +63,7 @@ function askQuestion(query) {
 
 
     // Random 3 số mới và thay vào vị trí 6,7,8 (tức là số 7 8 9)
-    const newThreeDigits = (Math.floor(Math.random() * 100) + threeDigits)
+    const newThreeDigits = (Math.floor(Math.random() * 300) + threeDigits)
       .toString()
       .padStart(3, "0");
 
@@ -83,6 +83,7 @@ function askQuestion(query) {
         )
       );
 
+        await driver.sleep(1000);
       if (shadowBox) {
         console.log("✅ Tìm thấy hộp có bóng đổ → Tiến hành mua");
 
