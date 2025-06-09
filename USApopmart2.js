@@ -57,10 +57,8 @@ function askQuestion(query) {
   const productId = extractIdFromUrl(url);
   const threeDigits = Number(productId.slice(6, 9));
 
-
   for (let i = 0; i < 10000; i++) {
     const productIdArray = productId.split("");
-
 
     // Random 3 số mới và thay vào vị trí 6,7,8 (tức là số 7 8 9)
     const newThreeDigits = (Math.floor(Math.random() * 300) + threeDigits)
@@ -74,18 +72,17 @@ function askQuestion(query) {
     const newProductId = productIdArray.join("");
     const randomUrl = `${baseUrl}${prefix}-${newProductId}`;
 
-   
-
     try {
+      await driver.sleep(1000);
       const shadowBox = await driver.findElement(
         By.css(
           "img.index_showBoxItem__5YQkR[alt='POP MART'][src*='box_pic_with_shadow']"
         )
       );
 
-        await driver.sleep(1000);
       if (shadowBox) {
         console.log("✅ Tìm thấy hộp có bóng đổ → Tiến hành mua");
+        await driver.sleep(2000);
 
         const buyBtn = await driver.findElement(
           By.xpath("//button[span[text()='Buy Multiple Boxes']]")
