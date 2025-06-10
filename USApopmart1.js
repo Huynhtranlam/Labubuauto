@@ -75,7 +75,7 @@ function askQuestion(query) {
     console.log(`🔄 Vòng lặp ${i + 1}: Truy cập ${randomUrl}`);
 
     try {
-      await driver.sleep(1000);
+      await driver.sleep(2000);
       const shadowBox = await driver.findElement(
         By.css(
           "img.index_showBoxItem__5YQkR[alt='POP MART'][src*='box_pic_with_shadow']"
@@ -114,10 +114,11 @@ function askQuestion(query) {
         await driver.switchTo().window(tabs[0]); // Quay lại tab cũ (nếu cần)
 
         console.log("🛒 Thêm thành công sẽ ngủ 20s rồi chạy tiếp nè");
-        await driver.sleep(20000);
+        await driver.sleep(5000);
       }
     } catch (err) {
       await driver.get(randomUrl);
+      await driver.sleep(2000);
     }
 
     await driver.sleep(2000);
@@ -126,7 +127,6 @@ function askQuestion(query) {
   console.log("🏁 Kết thúc 100 vòng lặp");
 
   await driver.sleep(1000000000);
-  // await driver.quit();
 })();
 
 function extractIdFromUrl(url) {
