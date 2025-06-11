@@ -1,6 +1,10 @@
 const chrome = require("selenium-webdriver/chrome");
 const readline = require("readline");
 const { Builder, until, By } = require("selenium-webdriver");
+const runBot = require("./runBot");
+const minimist = require("minimist");
+const { spawn } = require("child_process");
+const args = minimist(process.argv.slice(2));
 require("chromedriver");
 
 // Hàm hỏi input và trả về Promise
@@ -17,6 +21,13 @@ function askQuestion(query) {
   );
 }
 
+if (args.url && args.mode && args.port && args.profile) {
+  runBot(args.url, args.mode, args.port, args.profile);
+  console.log(
+    `Đang chạy bot với URL: ${args.url}, chế độ: ${args.mode}, port: ${args.port}, profile: ${args.profile}`
+  );
+  return;
+}
 (async () => {
   const url = await askQuestion("Nhập URL cần truy cập: ");
   const mode = await askQuestion(
@@ -26,12 +37,12 @@ function askQuestion(query) {
   const options = new chrome.Options()
     .addArguments(
       "--disable-blink-features=AutomationControlled",
-      "--remote-debugging-port=9221",
+      "--remote-debugging-port=9222",
       "--disable-gpu",
       "--no-sandbox",
       "--disable-dev-shm-usage",
       "--start-maximized",
-      `--user-data-dir=D:/labubu/tmp-profile2`,
+      `--user-data-dir=D:/labubu/tmp-profile0`,
       `--profile-directory=Default`,
       "--enable-unsafe-webgpu",
       "--enable-unsafe-swiftshader"
@@ -50,7 +61,6 @@ function askQuestion(query) {
     await driver.sleep(1000000000); // giữ Chrome mở
     return;
   }
-
   await driver.get(url); // 🟢 Đúng URL do người dùng nhập
   const baseUrl = "https://www.popmart.com/us/pop-now/set/";
   const prefix = url.split("/set/")[1].split("-")[0]; // lấy '40'
@@ -59,6 +69,7 @@ function askQuestion(query) {
 
   for (let i = 0; i < 10000; i++) {
     const productIdArray = productId.split("");
+    const now = new Date();
 
     // Random 3 số mới và thay vào vị trí 6,7,8 (tức là số 7 8 9)
     const newThreeDigits = (Math.floor(Math.random() * 300) + threeDigits)
@@ -76,12 +87,23 @@ function askQuestion(query) {
 
     try {
       await driver.sleep(2000);
+
+      const notifyButton = await driver.findElement(
+        By.css("button.ant-btn.ant-btn-primary.index_subscribe__HL9BU")
+      );
+      if (notifyButton) {
+        await driver.get(randomUrl);
+        console.log(`🔔 Đã nhấn nút thông báo lúc: ${now.toLocaleString()}`);
+        await driver.sleep(20000);
+      }
+    } catch (err) {
+      console.log("🔔 Không tìm thấy nút thông báo, tiếp tục kiểm tra hộp...");
+      await driver.sleep(2000);
       const shadowBox = await driver.findElement(
         By.css(
           "img.index_showBoxItem__5YQkR[alt='POP MART'][src*='box_pic_with_shadow']"
         )
       );
-
       if (shadowBox) {
         console.log("✅ Tìm thấy hộp có bóng đổ → Tiến hành mua");
         await driver.sleep(2000);
@@ -108,18 +130,41 @@ function askQuestion(query) {
         await addToBagBtn.click();
         await driver.sleep(2000);
         await driver.executeScript(
-          'window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank");'
+          'window.open("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", "_blank");'
         );
         let tabs = await driver.getAllWindowHandles();
         await driver.switchTo().window(tabs[0]); // Quay lại tab cũ (nếu cần)
 
         console.log("🛒 Thêm thành công sẽ ngủ 20s rồi chạy tiếp nè");
+        await driver.sleep(5000);
+        spawn(
+          "cmd",
+          [
+            "/k",
+            "node",
+            "main.js",
+            "--url",
+            url,
+            "--mode",
+            "2",
+            "--port",
+            "9222",
+            "--profile",
+            "0",
+          ],
+          {
+            detached: true,
+            stdio: "ignore",
+          }
+        );
+        break;
+      } else {
+        console.log(`Lỗi: ${err.message}`);
+        console.log("🔄 Reload trang và thử lại...", now.toLocaleString());
         await driver.sleep(10000);
+        await driver.get(randomUrl);
       }
-    } catch (err) {
-      await driver.get(randomUrl);
     }
-
   }
 
   console.log("🏁 Kết thúc 100 vòng lặp");

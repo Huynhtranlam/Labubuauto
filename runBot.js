@@ -1,37 +1,17 @@
 const chrome = require("selenium-webdriver/chrome");
-const readline = require("readline");
-const { Builder, until, By } = require("selenium-webdriver");
+const { Builder, By, until } = require("selenium-webdriver");
 require("chromedriver");
 
-// Hàm hỏi input và trả về Promise
-function askQuestion(query) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  return new Promise((resolve) =>
-    rl.question(query, (ans) => {
-      rl.close();
-      resolve(ans);
-    })
-  );
-}
-
-(async () => {
-  const url = await askQuestion("Nhập URL cần truy cập: ");
-  const mode = await askQuestion(
-    "Chọn chế độ:\n1. Mở trình duyệt\n2. Mua hàng tự động\nNhập số: "
-  );
-
+ async function runBot(url, mode,port,profile) {
   const options = new chrome.Options()
     .addArguments(
       "--disable-blink-features=AutomationControlled",
-      "--remote-debugging-port=9221",
+     `--remote-debugging-port=${port}`,
       "--disable-gpu",
       "--no-sandbox",
       "--disable-dev-shm-usage",
       "--start-maximized",
-      `--user-data-dir=D:/labubu/tmp-profile2`,
+       `--user-data-dir=D:/labubu/tmp-profile${profile}`,
       `--profile-directory=Default`,
       "--enable-unsafe-webgpu",
       "--enable-unsafe-swiftshader"
@@ -45,22 +25,23 @@ function askQuestion(query) {
 
   const isWebDriver = await driver.executeScript("return navigator.webdriver");
   console.log("navigator.webdriver:", isWebDriver);
+
   if (mode === "1") {
-    await driver.get(url); // 🟢 Đúng URL do người dùng nhập
-    await driver.sleep(1000000000); // giữ Chrome mở
+    await driver.get(url);
+    await driver.sleep(1000000000); // giữ trình duyệt mở
     return;
   }
 
-  await driver.get(url); // 🟢 Đúng URL do người dùng nhập
+  // === MUA HÀNG TỰ ĐỘNG ===
+  await driver.get(url);
+
   const baseUrl = "https://www.popmart.com/us/pop-now/set/";
-  const prefix = url.split("/set/")[1].split("-")[0]; // lấy '40'
+  const prefix = url.split("/set/")[1].split("-")[0];
   const productId = extractIdFromUrl(url);
   const threeDigits = Number(productId.slice(6, 9));
 
   for (let i = 0; i < 10000; i++) {
     const productIdArray = productId.split("");
-
-    // Random 3 số mới và thay vào vị trí 6,7,8 (tức là số 7 8 9)
     const newThreeDigits = (Math.floor(Math.random() * 300) + threeDigits)
       .toString()
       .padStart(3, "0");
@@ -71,15 +52,12 @@ function askQuestion(query) {
 
     const newProductId = productIdArray.join("");
     const randomUrl = `${baseUrl}${prefix}-${newProductId}`;
-
     console.log(`🔄 Vòng lặp ${i + 1}: Truy cập ${randomUrl}`);
 
     try {
       await driver.sleep(2000);
       const shadowBox = await driver.findElement(
-        By.css(
-          "img.index_showBoxItem__5YQkR[alt='POP MART'][src*='box_pic_with_shadow']"
-        )
+        By.css("img.index_showBoxItem__5YQkR[alt='POP MART'][src*='box_pic_with_shadow']")
       );
 
       if (shadowBox) {
@@ -90,6 +68,7 @@ function askQuestion(query) {
           By.xpath("//button[span[text()='Buy Multiple Boxes']]")
         );
         await buyBtn.click();
+
         await driver.sleep(1000);
 
         const selectAllSpan = await driver.findElement(
@@ -106,26 +85,27 @@ function askQuestion(query) {
         );
         await driver.wait(until.elementIsVisible(addToBagBtn), 5000);
         await addToBagBtn.click();
+
         await driver.sleep(2000);
         await driver.executeScript(
           'window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank");'
         );
-        let tabs = await driver.getAllWindowHandles();
-        await driver.switchTo().window(tabs[0]); // Quay lại tab cũ (nếu cần)
+        const tabs = await driver.getAllWindowHandles();
+        await driver.switchTo().window(tabs[0]);
 
         console.log("🛒 Thêm thành công sẽ ngủ 20s rồi chạy tiếp nè");
-        await driver.sleep(10000);
+        await driver.sleep(5000);
       }
     } catch (err) {
       await driver.get(randomUrl);
     }
-
   }
 
-  console.log("🏁 Kết thúc 100 vòng lặp");
+  console.log("🏁 Kết thúc 10000 vòng lặp");
+  await driver.sleep(1000000000); // Giữ trình duyệt mở
+}
 
-  await driver.sleep(1000000000);
-})();
+exports.runBot = runBot;
 
 function extractIdFromUrl(url) {
   const match = url.match(/-(\d+)$/);

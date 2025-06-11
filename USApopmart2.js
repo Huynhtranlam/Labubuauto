@@ -114,14 +114,12 @@ function askQuestion(query) {
         await driver.switchTo().window(tabs[0]); // Quay lại tab cũ (nếu cần)
 
         console.log("🛒 Thêm thành công sẽ ngủ 20s rồi chạy tiếp nè");
-        await driver.sleep(5000);
+        await driver.sleep(10000);
       }
     } catch (err) {
       await driver.get(randomUrl);
-      await driver.sleep(2000);
     }
 
-    await driver.sleep(2000);
   }
 
   console.log("🏁 Kết thúc 100 vòng lặp");
