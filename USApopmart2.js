@@ -118,6 +118,7 @@ function askQuestion(query) {
       }
     } catch (err) {
       await driver.get(randomUrl);
+        await driver.sleep(2000);
     }
 
   }
